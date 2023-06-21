@@ -8,19 +8,15 @@ from threading import Thread
 from apps.cajero import Cajero
 
 class Login(Toplevel):
-    def __init__(self, root):
+    def __init__(self, root, num):
         super().__init__(root)
-        self.title('Login')
+        self.title(f'Login Cajero {num}')
         self.geometry("300x200")
-        self.resizable(False,False)
         
         #para aplicar efecto de ocultar login
         self.parent =root
 
         self.create_widgets()
-
-        
-
 
 
     def create_widgets(self):
