@@ -23,6 +23,8 @@ class Cajero(Toplevel):
         
         self.create_widgets()
 
+        #self.temporizador = None
+
         #variable validar operacion
         self.validarOperacion= False
 
@@ -111,6 +113,7 @@ class Cajero(Toplevel):
         while not evento2.is_set():
             print('inicio hilo')
             time.sleep(3)
+        #    self.temporizador = self.after(10000, self.cerrarCajero,0, self.number)
             if self.monto.get() != '':
                 mensajeUsuario = f'Transaccion exitosa\n'+ self.mensaje.get()
                 self.pantalla.set(mensajeUsuario)
@@ -120,6 +123,9 @@ class Cajero(Toplevel):
             print('fin hilo')
 
     def realizarRetiro(self):
+        #if self.temporizador is not None:
+        #    self.after_cancel(self.temporizador)
+        #    self.temporizador =None
         self.validarOperacion= False
         self.opcion.set('Realizando retiro...\nIndique el monto:\n')
         self.pantalla.set(self.opcion.get())
@@ -128,6 +134,9 @@ class Cajero(Toplevel):
         self.after(30000, self.tiempoEspera)
     
     def realizarDeposito(self):
+        #if self.temporizador is not None:
+        #    self.after_cancel(self.temporizador)
+        #    self.temporizador =None
         self.validarOperacion= False
         self.opcion.set('Realizando deposito...\nIndique el monto:\n')
         #mensaje para el tipo de transaccion
@@ -139,6 +148,9 @@ class Cajero(Toplevel):
 
 
     def monto1(self):
+        #if self.temporizador is not None:
+        #    self.after_cancel(self.temporizador)
+        #    self.temporizador =None
         self.monto.set('50000')
         self.pantalla.set(self.opcion.get()+self.monto.get())
         
@@ -151,12 +163,18 @@ class Cajero(Toplevel):
         self.after(3000, self.evento1.set)
     
     def monto2(self):
+        #if self.temporizador is not None:
+        #    self.after_cancel(self.temporizador)
+        #    self.temporizador =None
         self.monto.set('30000')
         self.pantalla.set(self.opcion.get()+self.monto.get())
         
         self.after(3000, self.evento1.set)
     
     def monto3(self):
+        #if self.temporizador is not None:
+        #    self.after_cancel(self.temporizador)
+        #    self.temporizador =None
         self.monto.set('10000')
         self.pantalla.set(self.opcion.get()+self.monto.get())
         
