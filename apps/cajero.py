@@ -6,11 +6,14 @@ import time
 
 from threading import Thread, Event
 
+from baseDatos.funcionescajero import Actualizar_EstadoCajero
+
 class Cajero(Toplevel):
-    def __init__(self,root):
+    def __init__(self,root, num):
         super().__init__(root)
         self.title('Cajero')
         self.geometry("420x420")
+        self.number = num
         
         #varibles de cajero
         self.pantalla = StringVar()
@@ -29,8 +32,15 @@ class Cajero(Toplevel):
         self.hilo = Thread(target=self.comprobarCuenta, args=(self.evento1, self.evento2,), daemon=True)
 
         self.hilo.start()
+
+        self.protocol("WM_DELETE_WINDOW", lambda: self.cerrarCajero(0, self.number))
+
+    def cerrarCajero(self, estado, num):
+        Actualizar_EstadoCajero(estado, num)
+        self.destroy()
     
     def create_widgets(self):
+        Actualizar_EstadoCajero(1,self.number)
         self.pantalla.set('Seleccione una opcion...')
         
         frame_principal = ttk.Frame(self)
@@ -78,16 +88,22 @@ class Cajero(Toplevel):
         btn_numero5.pack(pady=5)
         btn_numero6 = ttk.Button(frame_derecho, text='Depositos', command=lambda: self.realizarDeposito())
         btn_numero6.pack(pady=5)
-        btn_numero7 = ttk.Button(frame_derecho, text='Salir', command=lambda: self.destroy())
+        btn_numero7 = ttk.Button(frame_derecho, text='Salir', command=lambda: self.salir())
         btn_numero7.pack(pady=5)
 
     #limpiar pantalla al terminar transaccion
     def resetearPantalla(self):
         self.pantalla.set('Seleccione una opcion...')
 
+
+    def salir(self):
+        Actualizar_EstadoCajero(0,self.number)
+        self.destroy()
+
     def tiempoEspera(self):
         if not self.validarOperacion:
             self.pantalla.set('Se acabo el tiempo de espera\nRetire la tarjeta')
+            Actualizar_EstadoCajero(0,self.number)
             self.after(5000,self.destroy)
 
 

@@ -8,7 +8,7 @@ from threading import Thread
 from apps.login import Login
 
 class BtnCajero(ttk.Frame):
-    def __init__(self, parent, number, validar_cajero):
+    def __init__(self, parent, number:int, validar_cajero):
         super().__init__(parent)
         self.image = PhotoImage(file='cajero.png')
         self.number = number
@@ -34,7 +34,7 @@ class BtnCajero(ttk.Frame):
         """ if self.Ocupado:
             messagebox.showinfo('Cajero Ocupado', f'Cajero {self.number} esta ocupado.')
         else: """
-        if not self.validar_cajero(self.number):
+        if not self.validar_cajero(int(self.number)):
             self.Login()
         else:
             messagebox.showinfo('Cajero Ocupado', f'Cajero {self.number} esta ocupado.')

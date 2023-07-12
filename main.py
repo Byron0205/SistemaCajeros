@@ -1,6 +1,8 @@
 from tkinter import ttk, Tk
 from tkinter import messagebox
 
+from baseDatos.funcionescajero import verificar_estadocajero,Actualizar_EstadoCajero
+
 from components.btn_cajero import BtnCajero
 
 from apps.cajero import Cajero
@@ -9,11 +11,6 @@ from apps.cajero import Cajero
 class GUI(ttk.Frame):
     def __init__(self, root):
         super().__init__(root)
-
-        self.ocupadoC1 = False
-        self.ocupadoC2 = False
-        self.ocupadoC3 = False
-        self.ocupadoC4 = False
 
         root.title('Cajeros')
         root.geometry('400x450')
@@ -40,42 +37,12 @@ class GUI(ttk.Frame):
         btnCajero.grid(column=0, row=6)
 
     def validar_cajero(self, cajero_num):
-        if cajero_num == 1:
-            ocupado = self.ocupadoC1
-        elif cajero_num == 2:
-            ocupado = self.ocupadoC2
-        elif cajero_num == 3:
-            ocupado = self.ocupadoC3
-        elif cajero_num == 4:
-            ocupado = self.ocupadoC4
-        else:
-            return
-
-        if ocupado:
-            return True
-        else:
-            self.ocupar_cajero(cajero_num)
+        estado = verificar_estadocajero(int(cajero_num))
+        if estado[0] == 0:
+            Actualizar_EstadoCajero(1,int(cajero_num))
             return False
-
-    def ocupar_cajero(self, cajero_num):
-        if cajero_num == 1:
-            self.ocupadoC1 = True
-        elif cajero_num == 2:
-            self.ocupadoC2 = True
-        elif cajero_num == 3:
-            self.ocupadoC3 = True
-        elif cajero_num == 4:
-            self.ocupadoC4 = True
-
-    def liberar_cajero(self, cajero_num):
-        if cajero_num == 1:
-            self.ocupadoC1 = False
-        elif cajero_num == 2:
-            self.ocupadoC2 = False
-        elif cajero_num == 3:
-            self.ocupadoC3 = False
-        elif cajero_num == 4:
-            self.ocupadoC4 = False
+        else:
+            return True
 
     def cajero(self):
         cajero = Cajero(self)

@@ -1,8 +1,12 @@
 import sqlite3
 
 def establecer_conexion():
-    conexion = sqlite3.connect("cajeros.sqlite")
-    return conexion
+    try:
+        conexion = sqlite3.connect("baseDatos\cajeros.sqlite")
+        return conexion
+    except Exception as e:
+        print(f'error al establecer la conexion {str(e)}')
+        return None
 
 def verificar_credenciales(num_tarjeta,contrsena):
     consulta = "Select * from UsuarioxTarjeta where numero_tarjeta = ?  AND contrasena = ?"
@@ -23,19 +27,28 @@ def Actualizar_Contrasena(contra,IDusuario):
     conexion.commit()
     conexion.close()
 
-def verificar_estadocajero(IDcajero):
+def verificar_estadocajero(IDcajero:int):
     consulta = "Select estado from Cajeros where IDcajero = ?"
-    Parametros = (IDcajero)
+    Parametros = (IDcajero,)
     conexion = establecer_conexion()
-    cursor=conexion.cursor()    
-    cursor.execute(consulta,Parametros)
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
+    if conexion is not None:
+        cursor=conexion.cursor()    
+        cursor.execute(consulta,Parametros)
+        resultados = cursor.fetchall()
+        conexion.close()
+        # Verificar si hay resultados
+        if resultados:
+            # Obtener solo la lista de resultados
+            lista_resultados = [resultado[0] for resultado in resultados]
+            return lista_resultados
+        else:
+            return []  # Devolver una lista vacía si no hay resultados
+    else:
+        print('error al establecer la conexion')
 
 def Actualizar_EstadoCajero(Estado,IDcajero):
     consulta = "UPDATE Cajeros set estado = ? WHERE IDcajero = ?"
-    parametros= (Estado,IDcajero)
+    parametros= (Estado,IDcajero,)
     conexion = establecer_conexion()
     cursor=conexion.cursor() 
     cursor.execute(consulta,parametros)

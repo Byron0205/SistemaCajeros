@@ -7,16 +7,26 @@ from threading import Thread
 
 from apps.cajero import Cajero
 
+from baseDatos.funcionescajero import Actualizar_EstadoCajero
+
 class Login(Toplevel):
     def __init__(self, root, num):
         super().__init__(root)
         self.title(f'Login Cajero {num}')
         self.geometry("300x200")
-        
+        self.number = num
         #para aplicar efecto de ocultar login
         self.parent =root
 
+        self.inicio = False
+
         self.create_widgets()
+
+        self.protocol("WM_DELETE_WINDOW", self.cerrarCajero)
+
+    def cerrarCajero(self):
+        Actualizar_EstadoCajero(0, self.number)
+        self.destroy()
 
 
     def create_widgets(self):
@@ -43,7 +53,7 @@ class Login(Toplevel):
 
         btnAceptar = ttk.Button(container, text="Iniciar sesion", command=lambda:self.validarLogin(user=txtUsuario.get(), password=txtpassword.get()))
         btnAceptar.pack()
-        btnVolver = ttk.Button(container, text="Terminar", command=lambda:self.destroy())
+        btnVolver = ttk.Button(container, text="Terminar", command=lambda:self.cerrarCajero(self.inicio))
         btnVolver.pack()
 
     def IniciarCajero(self):
@@ -51,11 +61,13 @@ class Login(Toplevel):
         window_thread.start()
 
     def VerCajero(self):
-        cajero = Cajero(self.parent)
+        cajero = Cajero(self.parent, self.number)
 
     def validarLogin(self,user, password):
         if user == 'admin' and password == 'admin':
             messagebox.showinfo(title='Inicio de sesion', message='Inicio de sesion exitoso!')
+            self.inicio = True
+
             self.destroy()
             self.IniciarCajero()
         else:
