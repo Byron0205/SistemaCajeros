@@ -63,3 +63,20 @@ def registro_Movimiento(IDusuario,Monto,Fecha,IDcajero,TipoMovimiento):
     cursor.execute(consulta,Parametros)
     conexion.commit()
     conexion.close()
+
+def realizarRetiro(Monto, idUsuario,idCajero):
+    conexion = establecer_conexion()
+    
+    #falta metodo para obtener saldos cajero y cuenta usuario
+
+    SaldoRestanteUsuario = Monto
+    SaldoRestanteCajero = Monto
+    consultaUsuario = f'UPDATE Usuarios set saldo = ? where IDusuario=?'
+    consultaCajero = f'UPDATE Cajeros set saldo = ? where IDcajero=?'
+    ParametrosUsuario = (SaldoRestanteUsuario, idUsuario)
+    ParametrosCajero = (SaldoRestanteCajero, idCajero)
+    cursor= conexion.cursor()
+    cursor.execute(consultaUsuario, ParametrosUsuario)
+    cursor.execute(consultaCajero, ParametrosCajero)
+    conexion.commit()
+    conexion.close()

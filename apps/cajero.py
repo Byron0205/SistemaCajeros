@@ -76,7 +76,7 @@ class Cajero(Toplevel):
         y = (alto_ventana - alto_rectangulo) / 4
 
         # Botones de la lado izquierdo con los numeros
-        btn_numero1 = ttk.Button(frame_izquierdo, text='50,000.00', command=lambda: self.monto1(),)
+        btn_numero1 = ttk.Button(frame_izquierdo, text='50,000.00', command=lambda: self.monto1())
         btn_numero1.pack(pady=5, side=tk.TOP)
         btn_numero2 = ttk.Button(frame_izquierdo, text='30,000.00', command=lambda: self.monto2())
         btn_numero2.pack(pady=5)
