@@ -6,14 +6,19 @@ import time
 
 from threading import Thread, Event
 
-from baseDatos.funcionescajero import Actualizar_EstadoCajero
+from baseDatos.funcionescajero import *
+
 
 class Cajero(Toplevel):
-    def __init__(self,root, num):
+    def __init__(self,root, num,idusuario):
         super().__init__(root)
         self.title('Cajero')
         self.geometry("420x420")
         self.number = num
+        #Id del usuario que ingreso al sistema
+        self.idUsuario = idusuario
+        #variable para saber si es deposito o retiro
+        self.Tipo_Transaccion = None
         
         #varibles de cajero
         self.pantalla = StringVar()
@@ -84,7 +89,7 @@ class Cajero(Toplevel):
         # Botones de la lado derecho con los numeros
         btn_numero4 = ttk.Button(frame_derecho, text='Retiros', command=lambda: self.realizarRetiro())
         btn_numero4.pack(pady=5)
-        btn_numero5 = ttk.Button(frame_derecho, text='Consultar', command=lambda: self.pantalla.set('Seleccionaste 2'))
+        btn_numero5 = ttk.Button(frame_derecho, text='Consultar', command=lambda: self.ConsultaMonto())
         btn_numero5.pack(pady=5)
         btn_numero6 = ttk.Button(frame_derecho, text='Depositos', command=lambda: self.realizarDeposito())
         btn_numero6.pack(pady=5)
@@ -116,11 +121,11 @@ class Cajero(Toplevel):
                 self.pantalla.set(mensajeUsuario)
                 self.after(5000,self.resetearPantalla)
                 self.monto.set('')
-        
             print('fin hilo')
 
     def realizarRetiro(self):
         self.validarOperacion= False
+        self.Tipo_Transaccion = "Retiro"
         self.opcion.set('Realizando retiro...\nIndique el monto:\n')
         self.pantalla.set(self.opcion.get())
         self.mensaje.set('retire su dinero')
@@ -129,6 +134,7 @@ class Cajero(Toplevel):
     
     def realizarDeposito(self):
         self.validarOperacion= False
+        self.Tipo_Transaccion = "Deposito"
         self.opcion.set('Realizando deposito...\nIndique el monto:\n')
         #mensaje para el tipo de transaccion
         self.mensaje.set('dinero agregado a su cuenta.')
@@ -137,6 +143,12 @@ class Cajero(Toplevel):
         #tiempo de espera para realizar la operacion
         self.after(30000, self.tiempoEspera)
 
+    #Metodo para la consulta de los montos
+    def ConsultaMonto(self):
+        saldo_Usuario = Ver_Saldo('1')
+        saldo_Usuario = saldo_Usuario[0]
+        mensaje = f"Su saldo es de ${saldo_Usuario}"
+        self.pantalla.set(mensaje)
 
     def monto1(self):
         self.monto.set('50000')
@@ -147,6 +159,30 @@ class Cajero(Toplevel):
         #cancelar tiempo espera si se ingresa un monto
         self.after_cancel(self.tiempoEspera)
 
+        #Validaciones
+        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario)
+        saldo_cajero = resultado[0]
+        saldo_Usuario = resultado[1]
+        if(self.Tipo_Transaccion == "Deposito"):
+            #Revisar si pasa un entero o string
+            if(saldo_cajero>='50000'):
+                #Si se puede realizar el deposito
+                pass
+            else:
+                mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
+                self.pantalla.set(mensaje)
+                pass
+        if(self.Tipo_Transaccion == "Retiro"):
+            if(saldo_cajero>='50000' ):
+                if(saldo_Usuario>='50000'):
+                    #Si se puede realizar el retiro
+                    pass
+                else:
+                    mensaje = "Su cuenta bancaria no cuenta con los suficientes montos"
+                    self.pantalla.set(mensaje)
+            else:
+                mensaje = "El cajero no cuenta con los suficientes montos"
+                self.pantalla.set(mensaje)
         #iniciar el proceso de comprobacion de fondos
         self.after(3000, self.evento1.set)
     
@@ -154,11 +190,63 @@ class Cajero(Toplevel):
         self.monto.set('30000')
         self.pantalla.set(self.opcion.get()+self.monto.get())
         
+
+        #Validaciones
+        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario)
+        saldo_cajero = resultado[0]
+        saldo_Usuario = resultado[1]
+        if(self.Tipo_Transaccion == "Deposito"):
+            #Revisar si pasa un entero o string
+            if(saldo_cajero>='50000'):
+                #Si se puede realizar el deposito
+                pass
+            else:
+                mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
+                self.pantalla.set(mensaje)
+                pass
+        if(self.Tipo_Transaccion == "Retiro"):
+            if(saldo_cajero>='50000' ):
+                if(saldo_Usuario>='50000'):
+                    #Si se puede realizar el retiro
+                    pass
+                else:
+                    mensaje = "Su cuenta bancaria no cuenta con los suficientes montos"
+                    self.pantalla.set(mensaje)
+            else:
+                mensaje = "El cajero no cuenta con los suficientes montos"
+                self.pantalla.set(mensaje)
+
         self.after(3000, self.evento1.set)
     
     def monto3(self):
         self.monto.set('10000')
         self.pantalla.set(self.opcion.get()+self.monto.get())
         
+        #Validaciones
+        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario)
+        saldo_cajero = resultado[0]
+        saldo_Usuario = resultado[1]
+        if(self.Tipo_Transaccion == "Deposito"):
+            #Revisar si pasa un entero o string
+            if(saldo_cajero>='50000'):
+                #Si se puede realizar el deposito
+                pass
+            else:
+                mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
+                self.pantalla.set(mensaje)
+                pass
+        if(self.Tipo_Transaccion == "Retiro"):
+            if(saldo_cajero>='50000' ):
+                if(saldo_Usuario>='50000'):
+                    #Si se puede realizar el retiro
+                    pass
+                else:
+                    mensaje = "Su cuenta bancaria no cuenta con los suficientes montos"
+                    self.pantalla.set(mensaje)
+            else:
+                mensaje = "El cajero no cuenta con los suficientes montos"
+                self.pantalla.set(mensaje)
+
+                
         self.after(3000, self.evento1.set)
 
