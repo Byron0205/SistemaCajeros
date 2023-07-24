@@ -113,3 +113,20 @@ def ObtenerSaldo_Usuario_Cajero(IDcajero,IDusuario):
         print('error al establecer la conexion')
 
 
+def insertar_saldoCliente(monto,IDusuario):
+    consulta = "UPDATE UsuarioxTarjeta set monto  = ? WHERE IDusuario = ?"
+    parametros= (monto,IDusuario,)
+    conexion = establecer_conexion()
+    cursor=conexion.cursor() 
+    cursor.execute(consulta,parametros)
+    conexion.commit()
+    conexion.close()
+
+def insertar_saltoCajero(monto,IDcajero):
+    consulta = "UPDATE Cajeros set monto  = ? WHERE IDcajero = ?"
+    parametros= (monto,IDcajero,)
+    conexion = establecer_conexion()
+    cursor=conexion.cursor() 
+    cursor.execute(consulta,parametros)
+    conexion.commit()
+    conexion.close()
