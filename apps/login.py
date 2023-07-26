@@ -67,8 +67,8 @@ class Login(Toplevel):
     def validarLogin(self,user, password):
 
         idUsuario = verificar_credenciales(user,password)
-        idUsuario = idUsuario[0]
         if(idUsuario is not None):
+            idUsuario = idUsuario[0]
             #print("ID de usuario encontrado:", resultado)
             messagebox.showinfo(title='Inicio de sesion', message='Inicio de sesion exitoso!')
             self.inicio = True

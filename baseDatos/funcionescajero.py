@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 
 def establecer_conexion():
     try:
@@ -64,9 +65,11 @@ def Actualizar_EstadoCajero(Estado,IDcajero):
     conexion.commit()
     conexion.close()
 
-def registro_Movimiento(IDusuario,Monto,Fecha,IDcajero,TipoMovimiento):
-    consulta = "Insert into Movimientos(IDusuario,Monto,Fecha,IDcajero,IDtipoMovimiento VALUES(?,?,?,?,?)"
-    Parametros = (IDusuario,Monto,Fecha,IDcajero,TipoMovimiento)
+def registro_Movimiento(IDusuario,Monto,IDcajero,TipoMovimiento):
+    Fecha = datetime.now()
+    fechaFormato = Fecha.strftime('%y/%m/%d')
+    consulta = "Insert into Movimientos(IDusuario,Monto,Fecha,IDcajero,IDtipoMovimiento) VALUES(?,?,?,?,?)"
+    Parametros = (IDusuario,Monto,fechaFormato,IDcajero,TipoMovimiento)
     conexion = establecer_conexion()
     cursor=conexion.cursor()    
     cursor.execute(consulta,Parametros)
@@ -75,7 +78,7 @@ def registro_Movimiento(IDusuario,Monto,Fecha,IDcajero,TipoMovimiento):
 
 def Ver_Saldo(IDusuario):
     consulta = "Select monto from UsuarioxTarjeta where IDusuario = ?"
-    Parametros = (IDusuario)
+    Parametros = (IDusuario,)
     conexion = establecer_conexion()
     if conexion is not None:
         cursor=conexion.cursor()    
@@ -94,8 +97,8 @@ def Ver_Saldo(IDusuario):
 
 #Metodo para obtener el saldo los cajeros y usuarios
 def ObtenerSaldo_Usuario_Cajero(IDcajero,IDusuario):
-    consulta = "SELECT monto FROM cajeros WHERE IDcajero = ? UNION SELECT monto FROM Usuarios WHERE IDUsuario = ?"
-    Parametros = (IDcajero,IDusuario)
+    consulta = "SELECT monto FROM cajeros WHERE IDcajero = ? UNION SELECT monto FROM UsuarioxTarjeta WHERE IDUsuario = ?"
+    Parametros = (IDcajero,IDusuario,)
     conexion = establecer_conexion()
     if conexion is not None:
         cursor=conexion.cursor()    
@@ -114,15 +117,17 @@ def ObtenerSaldo_Usuario_Cajero(IDcajero,IDusuario):
 
 
 def insertar_saldoCliente(monto,IDusuario):
+    saldo= Ver_Saldo(IDusuario)
+    FondosCuenta = int(monto) + saldo[0]
     consulta = "UPDATE UsuarioxTarjeta set monto  = ? WHERE IDusuario = ?"
-    parametros= (monto,IDusuario,)
+    parametros= (FondosCuenta,IDusuario,)
     conexion = establecer_conexion()
     cursor=conexion.cursor() 
     cursor.execute(consulta,parametros)
     conexion.commit()
     conexion.close()
 
-def insertar_saltoCajero(monto,IDcajero):
+def insertar_saldoCajero(monto,IDcajero):
     consulta = "UPDATE Cajeros set monto  = ? WHERE IDcajero = ?"
     parametros= (monto,IDcajero,)
     conexion = establecer_conexion()

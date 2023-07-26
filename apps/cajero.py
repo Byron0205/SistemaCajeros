@@ -154,9 +154,10 @@ class Cajero(Toplevel):
 
     #Metodo para la consulta de los montos
     def ConsultaMonto(self):
-        saldo_Usuario = Ver_Saldo('1')
+        saldo_Usuario = Ver_Saldo(self.idUsuario)
         saldo_Usuario = saldo_Usuario[0]
         mensaje = f"Su saldo es de ${saldo_Usuario}"
+        registro_Movimiento(self.idUsuario,0,self.number,3)
         self.pantalla.set(mensaje)
 
     def monto1(self):
@@ -177,8 +178,9 @@ class Cajero(Toplevel):
         saldo_Usuario = resultado[1]
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
-            if(saldo_cajero>='50000'):
-                #Si se puede realizar el deposito
+            if(saldo_cajero>=50000):
+                insertar_saldoCliente(self.monto.get(),self.idUsuario)
+                registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
                 pass
             else:
                 mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
@@ -212,9 +214,9 @@ class Cajero(Toplevel):
         saldo_Usuario = resultado[1]
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
-            if(saldo_cajero>='50000'):
-                #Si se puede realizar el deposito
-                pass
+            if(saldo_cajero>=30000):
+                insertar_saldoCliente(self.monto.get(),self.idUsuario)
+                registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
             else:
                 mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
                 self.pantalla.set(mensaje)
@@ -246,9 +248,9 @@ class Cajero(Toplevel):
         saldo_Usuario = resultado[1]
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
-            if(saldo_cajero>='50000'):
-                #Si se puede realizar el deposito
-                pass
+            if(saldo_cajero>=10000):
+                insertar_saldoCliente(self.monto.get(),self.idUsuario)
+                registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
             else:
                 mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
                 self.pantalla.set(mensaje)
