@@ -53,7 +53,7 @@ class Login(Toplevel):
 
         btnAceptar = ttk.Button(container, text="Iniciar sesion", command=lambda:self.validarLogin(user=txtUsuario.get(), password=txtpassword.get()))
         btnAceptar.pack()
-        btnVolver = ttk.Button(container, text="Terminar", command=lambda:self.cerrarCajero(self.inicio))
+        btnVolver = ttk.Button(container, text="Terminar", command=lambda:self.cerrarCajero())
         btnVolver.pack()
 
     def IniciarCajero(self,idusuario):
@@ -67,7 +67,7 @@ class Login(Toplevel):
     def validarLogin(self,user, password):
 
         idUsuario = verificar_credenciales(user,password)
-        if(idUsuario is not None):
+        if(idUsuario != []):
             idUsuario = idUsuario[0]
             #print("ID de usuario encontrado:", resultado)
             messagebox.showinfo(title='Inicio de sesion', message='Inicio de sesion exitoso!')
