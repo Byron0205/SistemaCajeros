@@ -67,7 +67,7 @@ def Actualizar_EstadoCajero(Estado,IDcajero):
 
 def registro_Movimiento(IDusuario,Monto,IDcajero,TipoMovimiento):
     Fecha = datetime.now()
-    fechaFormato = Fecha.strftime('%y/%m/%d')
+    fechaFormato = Fecha.strftime('%d/%m/%y %H:%M:%S')
     consulta = "Insert into Movimientos(IDusuario,Monto,Fecha,IDcajero,IDtipoMovimiento) VALUES(?,?,?,?,?)"
     Parametros = (IDusuario,Monto,fechaFormato,IDcajero,TipoMovimiento)
     conexion = establecer_conexion()
