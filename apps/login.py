@@ -7,7 +7,7 @@ from threading import Thread
 
 from apps.cajero import Cajero
 
-from baseDatos.funcionescajero import Actualizar_EstadoCajero
+from baseDatos.funcionescajero import *
 
 class Login(Toplevel):
     def __init__(self, root, num):
@@ -56,20 +56,33 @@ class Login(Toplevel):
         btnVolver = ttk.Button(container, text="Terminar", command=lambda:self.cerrarCajero(self.inicio))
         btnVolver.pack()
 
-    def IniciarCajero(self):
-        window_thread = Thread(target=self.VerCajero)
+    def IniciarCajero(self,idusuario):
+        window_thread = Thread(target=self.VerCajero(idusuario))
         window_thread.start()
 
-    def VerCajero(self):
-        cajero = Cajero(self.parent, self.number)
+    def VerCajero(self,idusuario):
+        #Aqui pasa el id del usuario
+        cajero = Cajero(self.parent, self.number,idusuario)
 
     def validarLogin(self,user, password):
-        if user == 'admin' and password == 'admin':
+
+        idUsuario = verificar_credenciales(user,password)
+        idUsuario = idUsuario[0]
+        if(idUsuario is not None):
+            #print("ID de usuario encontrado:", resultado)
             messagebox.showinfo(title='Inicio de sesion', message='Inicio de sesion exitoso!')
             self.inicio = True
-
             self.destroy()
-            self.IniciarCajero()
+            self.IniciarCajero(idUsuario)
         else:
             messagebox.showerror(title='Inicio de sesion', message='Credenciales incorrectas!')
             self.focus_force()
+        #if user == 'admin' and password == 'admin':
+            #messagebox.showinfo(title='Inicio de sesion', message='Inicio de sesion exitoso!')
+            #self.inicio = True
+        
+            #self.destroy()
+            #self.IniciarCajero()
+        #else:
+            #messagebox.showerror(title='Inicio de sesion', message='Credenciales incorrectas!')
+            #self.focus_force()
