@@ -15,6 +15,7 @@ class Login(Toplevel):
         self.title(f'Login Cajero {num}')
         self.geometry("300x200")
         self.number = num
+        self.tarjeta = ''
         #para aplicar efecto de ocultar login
         self.parent =root
 
@@ -62,14 +63,16 @@ class Login(Toplevel):
 
     def VerCajero(self,idusuario):
         #Aqui pasa el id del usuario
-        cajero = Cajero(self.parent, self.number,idusuario)
+        cajero = Cajero(self.parent, self.number,idusuario, self.tarjeta)
 
     def validarLogin(self,user, password):
 
-        idUsuario = verificar_credenciales(user,password)
-        if(idUsuario != []):
-            idUsuario = idUsuario[0]
-            #print("ID de usuario encontrado:", resultado)
+        user_data = verificar_credenciales(user,password)
+        if(user_data != []):
+            idUsuario = user_data[0][0]
+            tarjeta = str(user_data[0][1])
+            self.tarjeta =tarjeta
+            print("ID de usuario encontrado:", idUsuario)
             messagebox.showinfo(title='Inicio de sesion', message='Inicio de sesion exitoso!')
             self.inicio = True
             self.destroy()
@@ -77,12 +80,3 @@ class Login(Toplevel):
         else:
             messagebox.showerror(title='Inicio de sesion', message='Credenciales incorrectas!')
             self.focus_force()
-        #if user == 'admin' and password == 'admin':
-            #messagebox.showinfo(title='Inicio de sesion', message='Inicio de sesion exitoso!')
-            #self.inicio = True
-        
-            #self.destroy()
-            #self.IniciarCajero()
-        #else:
-            #messagebox.showerror(title='Inicio de sesion', message='Credenciales incorrectas!')
-            #self.focus_force()

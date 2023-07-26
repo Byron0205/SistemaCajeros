@@ -10,11 +10,13 @@ from baseDatos.funcionescajero import *
 
 
 class Cajero(Toplevel):
-    def __init__(self,root, num,idusuario):
+    def __init__(self,root, num,idusuario, num_tarjeta):
         super().__init__(root)
         self.title('Cajero')
         self.geometry("420x420")
         self.number = num
+        #codigo de tarjeta del usuario actual
+        self.tarjeta = num_tarjeta
         #Id del usuario que ingreso al sistema
         self.idUsuario = idusuario
         #variable para saber si es deposito o retiro
@@ -154,7 +156,7 @@ class Cajero(Toplevel):
 
     #Metodo para la consulta de los montos
     def ConsultaMonto(self):
-        saldo_Usuario = Ver_Saldo(self.idUsuario)
+        saldo_Usuario = Ver_Saldo_Tajerta(self.idUsuario,self.tarjeta)
         saldo_Usuario = saldo_Usuario[0]
         mensaje = f"Su saldo es de ${saldo_Usuario}"
         registro_Movimiento(self.idUsuario,0,self.number,3)
@@ -173,13 +175,15 @@ class Cajero(Toplevel):
         self.after_cancel(self.tiempoEspera)
 
         #Validaciones
-        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario)
-        saldo_cajero = resultado[0]
-        saldo_Usuario = resultado[1]
+        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario, self.tarjeta)
+        saldo_cajero = resultado[1]
+        saldo_Usuario = resultado[0]
+        print('ver tarjeta desde cajero: ', self.tarjeta)
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
             if(saldo_cajero>=50000):
                 insertar_saldoCliente(self.monto.get(),self.idUsuario)
+                insertar_saldoTarjetaCliente(self.monto.get(),self.idUsuario, self.tarjeta)
                 registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
                 pass
             else:
@@ -209,13 +213,14 @@ class Cajero(Toplevel):
         
 
         #Validaciones
-        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario)
-        saldo_cajero = resultado[0]
-        saldo_Usuario = resultado[1]
+        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario,self.tarjeta)
+        saldo_cajero = resultado[1]
+        saldo_Usuario = resultado[0]
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
             if(saldo_cajero>=30000):
                 insertar_saldoCliente(self.monto.get(),self.idUsuario)
+                insertar_saldoTarjetaCliente(self.monto.get(),self.idUsuario, self.tarjeta)
                 registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
             else:
                 mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
@@ -243,13 +248,15 @@ class Cajero(Toplevel):
         self.pantalla.set(self.opcion.get()+self.monto.get())
         
         #Validaciones
-        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario)
-        saldo_cajero = resultado[0]
-        saldo_Usuario = resultado[1]
+        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario, self.tarjeta)
+        print(resultado)
+        saldo_Usuario = resultado[0]
+        saldo_cajero = resultado[1]
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
             if(saldo_cajero>=10000):
                 insertar_saldoCliente(self.monto.get(),self.idUsuario)
+                insertar_saldoTarjetaCliente(self.monto.get(),self.idUsuario, self.tarjeta)
                 registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
             else:
                 mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
