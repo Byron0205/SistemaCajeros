@@ -236,6 +236,12 @@ class Cajero(Toplevel):
                     retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
                     modificar_saldoCajero(self.monto.get(), self.number)
                     registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
+            if(saldo_cajero>=30000 ):
+                if(saldo_Usuario>=30000):
+                    retirar_saldoCliente(self.monto.get(),self.idUsuario)
+                    retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
+                    modificar_saldoCajero(self.monto.get(), self.number)
+                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
                 else:
                     mensaje = "Su cuenta bancaria no cuenta con los suficientes montos"
                     self.pantalla.set(mensaje)
@@ -268,6 +274,12 @@ class Cajero(Toplevel):
                 self.pantalla.set(mensaje)
                 pass
         if(self.Tipo_Transaccion == "Retiro"):
+            if(saldo_cajero>=10000 ):
+                if(saldo_Usuario>=10000):
+                    retirar_saldoCliente(self.monto.get(),self.idUsuario)
+                    retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
+                    modificar_saldoCajero(self.monto.get(), self.number)
+                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
             if(saldo_cajero>=10000 ):
                 if(saldo_Usuario>=10000):
                     retirar_saldoCliente(self.monto.get(),self.idUsuario)
