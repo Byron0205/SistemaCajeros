@@ -34,7 +34,7 @@ class Cajero(Toplevel):
         
         self.create_widgets()
 
-        #self.temporizador = None
+        self.temporizador = None
 
         #variable validar operacion
         self.validarOperacion= False
@@ -69,7 +69,7 @@ class Cajero(Toplevel):
         frame_central.pack(fill=tk.BOTH, expand=True)
 
     
-        lbl_pantalla = ttk.Label(frame_central, textvariable=self.pantalla, background='grey', foreground='white', font='Arial 12 bold')
+        lbl_pantalla = ttk.Label(frame_central, textvariable=self.pantalla,wraplength=200, background='grey', foreground='white', font='Arial 12 bold')
         lbl_pantalla.pack(fill=tk.BOTH, expand=True)
 
 
@@ -119,35 +119,52 @@ class Cajero(Toplevel):
             Actualizar_EstadoCajero(0,self.number)
             self.after(5000,self.destroy)
 
+    #def cancelarTemporizador(self):
+    #    if self.temporizador is not None:
+    #        self.after_cancel(self.temporizador)
+    #        self.temporizador = None
 
     def comprobarCuenta(self, evento1, evento2):
         while not evento2.is_set():
-            print('inicio hilo')
             time.sleep(3)
-        #    self.temporizador = self.after(10000, self.cerrarCajero,0, self.number)
-            if self.monto.get() != '':
-                mensajeUsuario = f'Transaccion exitosa\n'+ self.mensaje.get()
-                self.pantalla.set(mensajeUsuario)
-                self.after(5000,self.resetearPantalla)
-                self.monto.set('')
-            print('fin hilo')
+            #self.temporizador = self.after(60000, self.cerrarCajero,0, self.number)
+
+            if self.Tipo_Transaccion == 'Retiro':
+                saldo_Usuario = Ver_Saldo_Tajerta(self.idUsuario,self.tarjeta)
+                print(f'el usuario tiene: {saldo_Usuario[0]}')
+
+                if self.monto.get() != '' and saldo_Usuario[0] > int(self.monto.get()):
+                    mensajeUsuario = f'Transaccion exitosa\n'+ self.mensaje.get()
+                    self.pantalla.set(mensajeUsuario)
+                    self.after(5000,self.resetearPantalla)
+                    self.monto.set('')
+                    self.Tipo_Transaccion = ''
+                else:
+                    self.after(5000,self.resetearPantalla)
+                    self.monto.set('')
+            if self.Tipo_Transaccion == 'Deposito':
+                if self.monto.get() != '':
+                    mensajeUsuario = f'Transaccion exitosa\n'+ self.mensaje.get()
+                    self.pantalla.set(mensajeUsuario)
+                    self.after(5000,self.resetearPantalla)
+                    self.monto.set('')
+                    self.Tipo_Transaccion = ''
 
     def realizarRetiro(self):
-        #if self.temporizador is not None:
-        #    self.after_cancel(self.temporizador)
-        #    self.temporizador =None
+        #self.cancelarTemporizador()
+        
         self.validarOperacion= False
         self.Tipo_Transaccion = "Retiro"
         self.opcion.set('Realizando retiro...\nIndique el monto:\n')
         self.pantalla.set(self.opcion.get())
         self.mensaje.set('retire su dinero')
+
         #tiempo de espera para realizar la operacion
-        self.after(30000, self.tiempoEspera)
+        #self.after(30000, self.tiempoEspera)
     
     def realizarDeposito(self):
-        #if self.temporizador is not None:
-        #    self.after_cancel(self.temporizador)
-        #    self.temporizador =None
+        #self.cancelarTemporizador()
+
         self.validarOperacion= False
         self.Tipo_Transaccion = "Deposito"
         self.opcion.set('Realizando deposito...\nIndique el monto:\n')
@@ -156,10 +173,12 @@ class Cajero(Toplevel):
         self.pantalla.set(self.opcion.get())
 
         #tiempo de espera para realizar la operacion
-        self.after(30000, self.tiempoEspera)
+        #self.after(30000, self.tiempoEspera)
 
     #Metodo para la consulta de los montos
     def ConsultaMonto(self):
+        #self.cancelarTemporizador()
+
         saldo_Usuario = Ver_Saldo_Tajerta(self.idUsuario,self.tarjeta)
         saldo_Usuario = saldo_Usuario[0]
         mensaje = f"Su saldo es de ${saldo_Usuario}"
@@ -169,11 +188,6 @@ class Cajero(Toplevel):
     def monto1(self):
         self.monto.set('50000')
         self.pantalla.set(self.opcion.get()+self.monto.get())
-        
-        self.validarOperacion = True
-
-        #cancelar tiempo espera si se ingresa un monto
-        self.after_cancel(self.tiempoEspera)
 
         with self.lock:
             print("Entrando al bloqueo 1")
@@ -181,7 +195,7 @@ class Cajero(Toplevel):
             resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario, self.tarjeta)
             saldo_cajero = resultado[1]
             saldo_Usuario = resultado[0]
-            print('ver tarjeta desde cajero: ', self.tarjeta)
+            #print('ver tarjeta desde cajero: ', self.tarjeta)
             print("Saliendo del bloqueo 1")
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
