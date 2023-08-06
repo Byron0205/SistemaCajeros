@@ -142,6 +142,7 @@ class Cajero(Toplevel):
                 else:
                     self.after(5000,self.resetearPantalla)
                     self.monto.set('')
+                    self.Tipo_Transaccion = ''
             if self.Tipo_Transaccion == 'Deposito':
                 if self.monto.get() != '':
                     mensajeUsuario = f'Transaccion exitosa\n'+ self.mensaje.get()
@@ -184,6 +185,7 @@ class Cajero(Toplevel):
         mensaje = f"Su saldo es de ${saldo_Usuario}"
         registro_Movimiento(self.idUsuario,0,self.number,3)
         self.pantalla.set(mensaje)
+        self.after(8000,self.resetearPantalla)
 
     def monto1(self):
         self.monto.set('50000')
