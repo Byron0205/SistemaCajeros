@@ -4,6 +4,8 @@ from tkinter import StringVar
 import tkinter as tk
 import time
 
+import threading
+
 from threading import Thread, Event
 
 from baseDatos.funcionescajero import *
@@ -21,6 +23,8 @@ class Cajero(Toplevel):
         self.idUsuario = idusuario
         #variable para saber si es deposito o retiro
         self.Tipo_Transaccion = None
+
+        self.lock = threading.Lock()
         
         #varibles de cajero
         self.pantalla = StringVar()
@@ -163,9 +167,6 @@ class Cajero(Toplevel):
         self.pantalla.set(mensaje)
 
     def monto1(self):
-        #if self.temporizador is not None:
-        #    self.after_cancel(self.temporizador)
-        #    self.temporizador =None
         self.monto.set('50000')
         self.pantalla.set(self.opcion.get()+self.monto.get())
         
@@ -174,18 +175,23 @@ class Cajero(Toplevel):
         #cancelar tiempo espera si se ingresa un monto
         self.after_cancel(self.tiempoEspera)
 
-        #Validaciones
-        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario, self.tarjeta)
-        saldo_cajero = resultado[1]
-        saldo_Usuario = resultado[0]
-        print('ver tarjeta desde cajero: ', self.tarjeta)
+        with self.lock:
+            print("Entrando al bloqueo 1")
+            #Validaciones
+            resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario, self.tarjeta)
+            saldo_cajero = resultado[1]
+            saldo_Usuario = resultado[0]
+            print('ver tarjeta desde cajero: ', self.tarjeta)
+            print("Saliendo del bloqueo 1")
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
             if(saldo_cajero>=50000):
-                insertar_saldoCliente(self.monto.get(),self.idUsuario)
-                insertar_saldoTarjetaCliente(self.monto.get(),self.idUsuario, self.tarjeta)
-                registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
-                pass
+                with self.lock:
+                    print("Entrando al bloqueo 2")
+                    insertar_saldoCliente(self.monto.get(),self.idUsuario)
+                    insertar_saldoTarjetaCliente(self.monto.get(),self.idUsuario, self.tarjeta)
+                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
+                    print("Saliendo del bloqueo 2")
             else:
                 mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
                 self.pantalla.set(mensaje)
@@ -193,11 +199,13 @@ class Cajero(Toplevel):
         if(self.Tipo_Transaccion == "Retiro"):
             if(saldo_cajero>=50000 ):
                 if(saldo_Usuario>=50000):
-                    retirar_saldoCliente(self.monto.get(),self.idUsuario)
-                    retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
-                    modificar_saldoCajero(self.monto.get(), self.number)
-                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
-                    pass
+                    with self.lock:
+                        print("Entrando al bloqueo 3")
+                        retirar_saldoCliente(self.monto.get(),self.idUsuario)
+                        retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
+                        modificar_saldoCajero(self.monto.get(), self.number)
+                        registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
+                        print("Saliendo del bloqueo 3")
                 else:
                     mensaje = "Su cuenta bancaria no cuenta con los suficientes fondos"
                     self.pantalla.set(mensaje)
@@ -208,23 +216,21 @@ class Cajero(Toplevel):
         self.after(3000, self.evento1.set)
     
     def monto2(self):
-        #if self.temporizador is not None:
-        #    self.after_cancel(self.temporizador)
-        #    self.temporizador =None
         self.monto.set('30000')
         self.pantalla.set(self.opcion.get()+self.monto.get())
         
-
-        #Validaciones
-        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario,self.tarjeta)
-        saldo_cajero = resultado[1]
-        saldo_Usuario = resultado[0]
+        with self.lock:
+            #Validaciones
+            resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario,self.tarjeta)
+            saldo_cajero = resultado[1]
+            saldo_Usuario = resultado[0]
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
             if(saldo_cajero>=30000):
-                insertar_saldoCliente(self.monto.get(),self.idUsuario)
-                insertar_saldoTarjetaCliente(self.monto.get(),self.idUsuario, self.tarjeta)
-                registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
+                with self.lock:
+                    insertar_saldoCliente(self.monto.get(),self.idUsuario)
+                    insertar_saldoTarjetaCliente(self.monto.get(),self.idUsuario, self.tarjeta)
+                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
             else:
                 mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
                 self.pantalla.set(mensaje)
@@ -232,43 +238,37 @@ class Cajero(Toplevel):
         if(self.Tipo_Transaccion == "Retiro"):
             if(saldo_cajero>=30000 ):
                 if(saldo_Usuario>=30000):
-                    retirar_saldoCliente(self.monto.get(),self.idUsuario)
-                    retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
-                    modificar_saldoCajero(self.monto.get(), self.number)
-                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
-            if(saldo_cajero>=30000 ):
-                if(saldo_Usuario>=30000):
-                    retirar_saldoCliente(self.monto.get(),self.idUsuario)
-                    retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
-                    modificar_saldoCajero(self.monto.get(), self.number)
-                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
+                    with self.lock:
+                        retirar_saldoCliente(self.monto.get(),self.idUsuario)
+                        retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
+                        modificar_saldoCajero(self.monto.get(), self.number)
+                        registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
                 else:
-                    mensaje = "Su cuenta bancaria no cuenta con los suficientes montos"
+                    mensaje = "Su cuenta bancaria no cuenta con los suficientes fondos"
                     self.pantalla.set(mensaje)
             else:
-                mensaje = "El cajero no cuenta con los suficientes montos"
+                mensaje = "El cajero no cuenta con los suficientes fondos"
                 self.pantalla.set(mensaje)
 
         self.after(3000, self.evento1.set)
     
     def monto3(self):
-        #if self.temporizador is not None:
-        #    self.after_cancel(self.temporizador)
-        #    self.temporizador =None
         self.monto.set('10000')
         self.pantalla.set(self.opcion.get()+self.monto.get())
         
-        #Validaciones
-        resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario, self.tarjeta)
-        print(resultado)
-        saldo_Usuario = resultado[0]
-        saldo_cajero = resultado[1]
+        with self.lock:
+            #Validaciones
+            resultado = ObtenerSaldo_Usuario_Cajero(self.number,self.idUsuario, self.tarjeta)
+            print(resultado)
+            saldo_Usuario = resultado[0]
+            saldo_cajero = resultado[1]
         if(self.Tipo_Transaccion == "Deposito"):
             #Revisar si pasa un entero o string
             if(saldo_cajero>=10000):
-                insertar_saldoCliente(self.monto.get(),self.idUsuario)
-                insertar_saldoTarjetaCliente(self.monto.get(),self.idUsuario, self.tarjeta)
-                registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
+                with self.lock:
+                    insertar_saldoCliente(self.monto.get(),self.idUsuario)
+                    insertar_saldoTarjetaCliente(self.monto.get(),self.idUsuario, self.tarjeta)
+                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,1)
             else:
                 mensaje = "El cajero no cuenta con esa cantidad para realizar el deposito"
                 self.pantalla.set(mensaje)
@@ -276,21 +276,16 @@ class Cajero(Toplevel):
         if(self.Tipo_Transaccion == "Retiro"):
             if(saldo_cajero>=10000 ):
                 if(saldo_Usuario>=10000):
-                    retirar_saldoCliente(self.monto.get(),self.idUsuario)
-                    retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
-                    modificar_saldoCajero(self.monto.get(), self.number)
-                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
-            if(saldo_cajero>=10000 ):
-                if(saldo_Usuario>=10000):
-                    retirar_saldoCliente(self.monto.get(),self.idUsuario)
-                    retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
-                    modificar_saldoCajero(self.monto.get(), self.number)
-                    registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
+                    with self.lock:
+                        retirar_saldoCliente(self.monto.get(),self.idUsuario)
+                        retirar_saldoTarjetaCliente(self.monto.get(),self.idUsuario,self.tarjeta)
+                        modificar_saldoCajero(self.monto.get(), self.number)
+                        registro_Movimiento(self.idUsuario,self.monto.get(),self.number,2)
                 else:
-                    mensaje = "Su cuenta bancaria no cuenta con los suficientes montos"
+                    mensaje = "Su cuenta bancaria no cuenta con los suficientes fondos"
                     self.pantalla.set(mensaje)
             else:
-                mensaje = "El cajero no cuenta con los suficientes montos"
+                mensaje = "El cajero no cuenta con los suficientes fondos"
                 self.pantalla.set(mensaje)
 
                 
